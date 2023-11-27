@@ -57,6 +57,9 @@ gost_hmac256 (const uint8_t *k, size_t n, const uint8_t *t, size_t len,
   GOST34112012Update (&gostbuf->ctx, t, len);
   GOST34112012Final (&gostbuf->ctx, gostbuf->digest);
 
+  /* Clear the context state. */
+  explicit_bzero (&gostbuf->ctx, sizeof (GOST34112012Context));
+
   GOST34112012Init (&gostbuf->ctx, GOSTR3411_2012_BITS);
 
   for (i = 0; i < sizeof (gostbuf->pad); i++)
@@ -67,6 +70,9 @@ gost_hmac256 (const uint8_t *k, size_t n, const uint8_t *t, size_t len,
   GOST34112012Update (&gostbuf->ctx, gostbuf->digest,
                       sizeof (gostbuf->digest));
   GOST34112012Final (&gostbuf->ctx, out32);
+
+  /* Clear the context state. */
+  explicit_bzero (gostbuf, sizeof (gost_hmac_256_t));
 }
 
 #endif /* INCLUDE_gost_yescrypt */

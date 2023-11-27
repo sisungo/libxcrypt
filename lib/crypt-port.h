@@ -201,6 +201,11 @@ extern size_t strcpy_or_abort (void *dst, size_t d_size, const void *src);
   __asm__(".globl _" extstr);                           \
   __asm__(".set _" extstr ", _" #intname)
 
+#elif defined _WIN32
+
+/* .symver is only supported for ELF format, Windows uses COFF/PE */
+# define symver_set(extstr, intname, version, mode)
+
 #elif defined __GNUC__ && __GNUC__ >= 3
 
 # define _strong_alias(name, aliasname) \
@@ -239,7 +244,7 @@ extern size_t strcpy_or_abort (void *dst, size_t d_size, const void *src);
 
 /* The macros for versioned symbols work differently in this library
    than they do in glibc.  They are mostly auto-generated
-   (see build-aux/gen-crypt-symbol-vers-h)
+   (see build-aux/scripts/gen-crypt-symbol-vers-h)
    and we currently don't support compatibility symbols that need a different
    definition from the default version.
 

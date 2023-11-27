@@ -1,5 +1,5 @@
 --- /dev/null
-+++ b/build-aux/symbol_uscore.m4
++++ b/build-aux/m4/symbol_uscore.m4
 @@ -0,0 +1,50 @@
 +# ltdl.m4 - Configure ltdl for the target system. -*-Autoconf-*-
 +#

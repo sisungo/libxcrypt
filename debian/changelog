@@ -1,3 +1,77 @@
+libxcrypt (1:4.4.36-2) unstable; urgency=medium
+
+  * Stop marking libcrypt1 Important+Protected. This was needed to help
+    the buster to bullseye upgrade path, but now it not much useful
+    anymore and it makes hard to uninstall additional multiarch packages.
+    (Closes: #1024616)
+
+ -- Marco d'Itri <md@linux.it>  Sat, 29 Jul 2023 18:32:40 +0200
+
+libxcrypt (1:4.4.36-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Marco d'Itri <md@linux.it>  Tue, 25 Jul 2023 04:47:38 +0200
+
+libxcrypt (1:4.4.35-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Marco d'Itri <md@linux.it>  Sun, 11 Jun 2023 00:53:18 +0200
+
+libxcrypt (1:4.4.33-2) unstable; urgency=medium
+
+  * Fix the loong64 architecture name. (Closes: #1027262)
+
+ -- Marco d'Itri <md@linux.it>  Fri, 06 Jan 2023 23:57:37 +0100
+
+libxcrypt (1:4.4.33-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Add a symbols file for loon64 (LoongArch).
+
+ -- Marco d'Itri <md@linux.it>  Fri, 18 Nov 2022 22:38:21 +0100
+
+libxcrypt (1:4.4.30-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Update again the Breaks with musl-dev. (Closes: #1017820)
+
+ -- Marco d'Itri <md@linux.it>  Wed, 02 Nov 2022 23:13:39 +0100
+
+libxcrypt (1:4.4.28-2) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * Move back crypt.h of libcrypt1 to the non-multiarch directory because
+    it broke the GCC and LLVM multilib builds. (Closes: #1014114)
+
+ -- Marco d'Itri <md@linux.it>  Sun, 10 Jul 2022 21:30:07 +0200
+
+libxcrypt (1:4.4.28-1) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * Enable building for musl-linux-any. (Closes: #1004102)
+  * Move crypt.h to the multiarch directory.
+
+  [ Victor Westerhuis ]
+  * Actually run the tests when building the package.
+
+ -- Marco d'Itri <md@linux.it>  Thu, 30 Jun 2022 01:12:35 +0200
+
+libxcrypt (1:4.4.27-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix M-A:same violation in libcrypt-dev by removing --link-doc.
+    (Closes: #987781)
+
+ -- Helmut Grohne <helmut@subdivi.de>  Fri, 14 Jan 2022 20:10:07 +0100
+
+libxcrypt (1:4.4.27-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Marco d'Itri <md@linux.it>  Fri, 17 Dec 2021 23:48:21 +0100
+
 libxcrypt (1:4.4.26-1) unstable; urgency=medium
 
   * New upstream release.

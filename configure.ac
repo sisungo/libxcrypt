@@ -1,12 +1,12 @@
 # Process this file with autoconf to produce a configure script.
-m4_include([build-aux/zw_automodern.m4])
+m4_include([build-aux/m4/zw_automodern.m4])
 AC_INIT([xcrypt],
-        [4.4.26],
+        [4.4.36],
         [https://github.com/besser82/libxcrypt/issues],
         [libxcrypt],
         [https://github.com/besser82/libxcrypt])
-AC_CONFIG_MACRO_DIR([build-aux])
-AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([build-aux/m4])
+AC_CONFIG_AUX_DIR([build-aux/m4-autogen])
 AC_CONFIG_SRCDIR([lib/crypt.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
@@ -47,6 +47,8 @@ AC_PROG_CPP
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
 zw_PROG_PERL([5.14.0])
+AC_PATH_PROG([GPG2], [gpg2], [false])
+AC_PATH_PROG([SHA256SUM], [sha256sum], [false])
 
 AC_USE_SYSTEM_EXTENSIONS
 AC_SYS_LARGEFILE
@@ -288,6 +290,39 @@ fi
 AC_SUBST([PYTHON])
 AM_CONDITIONAL([ENABLE_KA_TABLE_GEN], [test x"$PYTHON" != "xfalse"])
 
+# The ucontext.h functions that we use were withdrawn from
+# POSIX.1-2008, so the existence of the header does not prove
+# we can use the functions.
+AS_IF([test $ac_cv_header_ucontext_h = yes],
+  [AC_CACHE_CHECK([whether all ucontext.h functions are available],
+     [ac_cv_header_ucontext_h_fns_available],
+     [AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+// This code isn't intended to make sense; it just validates the
+// type signature of all four context functions, and avoids tripping
+// any of the many warnings we may have active.
+#include <ucontext.h>
+static int x;
+static void fn1(void) {}
+static void fn2(int a, int b) { x = a - b; }
+]], [[
+  ucontext_t uc1, uc2;
+  if (getcontext(&uc1)) return 1;
+  if (setcontext(&uc1)) return 1;
+  makecontext(&uc1, fn1, 0);
+  makecontext(&uc2, fn2, 2, 1, 1);
+  if (swapcontext(&uc1, &uc2)) return 1;
+  return x;
+]])],
+        [ac_cv_header_ucontext_h_fns_available=yes],
+        [ac_cv_header_ucontext_h_fns_available=no])])],
+  [ac_cv_header_ucontext_h_fns_available=no])
+
+if test $ac_cv_header_ucontext_h_fns_available = yes; then
+  AC_DEFINE([USE_SWAPCONTEXT], 1,
+    [Define to 1 if getcontext, setcontext, makecontext, and swapcontext are
+     available from ucontext.h without deprecation warnings.])
+fi
+
 # Configure options.
 AC_ARG_ENABLE([failure-tokens],
     AS_HELP_STRING(
@@ -399,7 +434,7 @@ AC_ARG_ENABLE([hashes],
 )
 # This code must run after $PERL is set.
 hashes_enabled=$(
-    $PERL "$srcdir"/build-aux/expand-selected-hashes \
+    $PERL "$srcdir"/build-aux/scripts/expand-selected-hashes \
           "$srcdir"/lib/hashes.conf \
           "$hashes_selected"
 )
@@ -448,8 +483,8 @@ if test $enable_obsolete_api = 1; then
   AC_MSG_CHECKING([minimum symbol version to use for compatibility symbols])
   SYMVER_FLOOR=$(
     export CC
-    $PERL ${srcdir}/build-aux/compute-symver-floor \
-      ${srcdir}/lib/libcrypt.minver $host_os $host_cpu \
+    $PERL "$srcdir"/build-aux/scripts/compute-symver-floor \
+      "$srcdir"/lib/libcrypt.minver $host_os $host_cpu \
     2>&AS_MESSAGE_LOG_FD
   )
   AC_MSG_RESULT([$SYMVER_FLOOR])
@@ -477,6 +512,14 @@ else
 fi
 AC_SUBST([SYMVER_FLOOR])
 AC_SUBST([SYMVER_MIN])
+
+# If symbol versioning is disabled for any reason, we should not rely on
+# versioned symbols in the testsuite.
+have_symver=0
+if test x$ax_check_vscript_flag != x; then have_symver=1; fi
+
+AC_DEFINE_UNQUOTED([HAVE_SYMVER], [$have_symver],
+  [Define as 1 if symbol versioning is enabled and applied.])
 
 # If we are not building the obsolete APIs then we shouldn't install
 # xcrypt.h or the compatibility symlinks either.

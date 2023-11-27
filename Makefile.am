@@ -12,13 +12,13 @@ AUTOMAKE_OPTIONS = \
 	gnits \
 	subdir-objects
 
-ACLOCAL_AMFLAGS = -I build-aux
+ACLOCAL_AMFLAGS = -I build-aux/m4
 
 AM_CPPFLAGS = -I$(srcdir)/lib
 AM_CFLAGS = $(WARN_CFLAGS) $(OPTI_FLAGS)
 AM_LDFLAGS = $(RELRO_FLAG) $(BINDNOW_FLAG)
 
-AUX = $(srcdir)/build-aux/
+SCRIPTS_AUX = $(srcdir)/build-aux/scripts
 STAMP = echo timestamp >
 
 @VALGRIND_CHECK_RULES@
@@ -34,16 +34,16 @@ EXTRA_DIST = \
 	lib/libcrypt.map.in \
 	lib/libcrypt.minver \
 	lib/xcrypt.h.in \
-	build-aux/BuildCommon.pm \
-	build-aux/check-perlcritic-config \
-	build-aux/compute-symver-floor \
-	build-aux/expand-selected-hashes \
-	build-aux/gen-crypt-h \
-	build-aux/gen-crypt-hashes-h \
-	build-aux/gen-crypt-symbol-vers-h \
-	build-aux/gen-libcrypt-map \
-	build-aux/move-if-change \
-	build-aux/skip-if-exec-format-error \
+	build-aux/scripts/BuildCommon.pm \
+	build-aux/scripts/check-perlcritic-config \
+	build-aux/scripts/compute-symver-floor \
+	build-aux/scripts/expand-selected-hashes \
+	build-aux/scripts/gen-crypt-h \
+	build-aux/scripts/gen-crypt-hashes-h \
+	build-aux/scripts/gen-crypt-symbol-vers-h \
+	build-aux/scripts/gen-libcrypt-map \
+	build-aux/scripts/move-if-change \
+	build-aux/scripts/skip-if-exec-format-error \
 	test/TestCommon.pm \
 	test/symbols-compat.pl \
 	test/symbols-renames.pl \
@@ -156,6 +156,9 @@ libcrypt_la_LDFLAGS = -version-info $(libcrypt_la_VERSION)
 
 if HAVE_VSCRIPT
 libcrypt_la_LDFLAGS += $(VSCRIPT_LDFLAGS),$(builddir)/libcrypt.map
+APPLY_SYMVERS = yes
+else
+APPLY_SYMVERS = no
 endif
 
 libcrypt_la_LDFLAGS += $(UNDEF_FLAG) $(TEXT_RELOC_FLAG) $(AM_LDFLAGS)
@@ -197,61 +200,62 @@ am__v_GENS_1 =
 
 libcrypt.map: libcrypt.map.stamp; @:
 libcrypt.map.stamp: \
-		lib/libcrypt.map.in build-aux/gen-libcrypt-map \
-		build-aux/BuildCommon.pm Makefile
-	$(AM_V_GENS)LC_ALL=C $(PERL) $(AUX)gen-libcrypt-map \
+		lib/libcrypt.map.in $(SCRIPTS_AUX)/gen-libcrypt-map \
+		$(SCRIPTS_AUX)/BuildCommon.pm Makefile
+	$(AM_V_GENS)LC_ALL=C $(PERL) $(SCRIPTS_AUX)/gen-libcrypt-map \
 	  SYMVER_MIN=$(SYMVER_MIN) \
 	  SYMVER_FLOOR=$(SYMVER_FLOOR) \
 	  COMPAT_ABI=$(COMPAT_ABI) \
 	  $(srcdir)/lib/libcrypt.map.in > libcrypt.map.T
-	$(AM_V_at)$(AUX)move-if-change libcrypt.map.T libcrypt.map
+	$(AM_V_at)$(SCRIPTS_AUX)/move-if-change libcrypt.map.T libcrypt.map
 	$(AM_V_at)$(STAMP) libcrypt.map.stamp
 
 crypt-hashes.h: crypt-hashes.h.stamp; @:
 crypt-hashes.h.stamp: \
-		build-aux/gen-crypt-hashes-h build-aux/BuildCommon.pm \
+		$(SCRIPTS_AUX)/gen-crypt-hashes-h $(SCRIPTS_AUX)/BuildCommon.pm \
 		lib/hashes.conf Makefile
 	$(AM_V_GENS)LC_ALL=C $(PERL) \
-	  $(AUX)gen-crypt-hashes-h \
+	  $(SCRIPTS_AUX)/gen-crypt-hashes-h \
 	  $(srcdir)/lib/hashes.conf $(hashes_enabled) > crypt-hashes.h.T
-	$(AM_V_at)$(AUX)move-if-change crypt-hashes.h.T crypt-hashes.h
+	$(AM_V_at)$(SCRIPTS_AUX)/move-if-change crypt-hashes.h.T crypt-hashes.h
 	$(AM_V_at)$(STAMP) crypt-hashes.h.stamp
 
 crypt-symbol-vers.h: crypt-symbol-vers.h.stamp; @:
 crypt-symbol-vers.h.stamp: \
-		build-aux/gen-crypt-symbol-vers-h \
-		build-aux/BuildCommon.pm \
+		$(SCRIPTS_AUX)/gen-crypt-symbol-vers-h \
+		$(SCRIPTS_AUX)/BuildCommon.pm \
 		lib/libcrypt.map.in Makefile
 	$(AM_V_GENS)LC_ALL=C $(PERL) \
-	  $(AUX)gen-crypt-symbol-vers-h \
+	  $(SCRIPTS_AUX)/gen-crypt-symbol-vers-h \
+	  $(APPLY_SYMVERS) \
 	  SYMVER_MIN=$(SYMVER_MIN) \
 	  SYMVER_FLOOR=$(SYMVER_FLOOR) \
 	  COMPAT_ABI=$(COMPAT_ABI) \
 	     $(srcdir)/lib/libcrypt.map.in > crypt-symbol-vers.h.T
-	$(AM_V_at)$(AUX)move-if-change crypt-symbol-vers.h.T crypt-symbol-vers.h
+	$(AM_V_at)$(SCRIPTS_AUX)/move-if-change crypt-symbol-vers.h.T crypt-symbol-vers.h
 	$(AM_V_at)$(STAMP) crypt-symbol-vers.h.stamp
 
 crypt.h: crypt.h.stamp; @:
 crypt.h.stamp: \
-		build-aux/gen-crypt-h build-aux/BuildCommon.pm \
+		$(SCRIPTS_AUX)/gen-crypt-h $(SCRIPTS_AUX)/BuildCommon.pm \
 		lib/crypt.h.in lib/hashes.conf config.h Makefile
 	$(AM_V_GENS)LC_ALL=C $(PERL) \
-	  $(AUX)gen-crypt-h \
+	  $(SCRIPTS_AUX)/gen-crypt-h \
 	  $(srcdir)/lib/crypt.h.in config.h \
 	  $(srcdir)/lib/hashes.conf $(hashes_enabled) \
 	  > crypt.h.T
-	$(AM_V_at)$(AUX)move-if-change crypt.h.T crypt.h
+	$(AM_V_at)$(SCRIPTS_AUX)/move-if-change crypt.h.T crypt.h
 	$(AM_V_at)$(STAMP) crypt.h.stamp
 
 xcrypt.h: xcrypt.h.stamp; @:
 xcrypt.h.stamp: \
-		build-aux/gen-crypt-h build-aux/BuildCommon.pm \
+		$(SCRIPTS_AUX)/gen-crypt-h $(SCRIPTS_AUX)/BuildCommon.pm \
 		lib/xcrypt.h.in config.h
 	$(AM_V_GENS)LC_ALL=C $(PERL) \
-	  $(AUX)gen-crypt-h \
+	  $(SCRIPTS_AUX)/gen-crypt-h \
 	  $(srcdir)/lib/xcrypt.h.in config.h \
 	  > xcrypt.h.T
-	$(AM_V_at)$(AUX)move-if-change xcrypt.h.T xcrypt.h
+	$(AM_V_at)$(SCRIPTS_AUX)/move-if-change xcrypt.h.T xcrypt.h
 	$(AM_V_at)$(STAMP) xcrypt.h.stamp
 
 install_exec_hook_targets =
@@ -467,7 +471,7 @@ AM_TESTS_ENVIRONMENT = \
 
 PL_LOG_COMPILER = $(PERL)
 if CROSS_COMPILING
-LOG_COMPILER = $(PERL) build-aux/skip-if-exec-format-error
+LOG_COMPILER = $(PERL) $(SCRIPTS_AUX)/skip-if-exec-format-error
 endif
 
 test/symbols-compat.log test/symbols-compat.trs: test/TestCommon.pm
@@ -599,8 +603,49 @@ phony_targets += test-programs
 # Additional checks to run in `make distcheck'.
 distcheck-hook:
 	cd $(top_srcdir) && \
-	  $(PERL) ./build-aux/check-perlcritic-config && \
+	  $(PERL) ./$(SCRIPTS_AUX)/check-perlcritic-config && \
 	  perlcritic --quiet ./
+
+# Target for generating a signed release tarball.
+release: libxcrypt-$(VERSION).tar.xz.sha256sum libxcrypt-gpgkey.gpg
+phony_targets += release
+
+libxcrypt-$(VERSION).tar.xz.asc: dist-xz
+	$(GPG2) \
+		--quiet \
+		--armor \
+		--detach-sign \
+		--default-key F52E98007594C21D \
+		--output libxcrypt-$(VERSION).tar.xz.asc.T \
+		libxcrypt-$(VERSION).tar.xz
+	$(AM_V_at)$(SCRIPTS_AUX)/move-if-change \
+		libxcrypt-$(VERSION).tar.xz.asc.T \
+		libxcrypt-$(VERSION).tar.xz.asc
+
+libxcrypt-$(VERSION).tar.xz.sha256sum: libxcrypt-$(VERSION).tar.xz.asc
+	$(SHA256SUM) \
+		libxcrypt-$(VERSION).tar.xz \
+		libxcrypt-$(VERSION).tar.xz.asc \
+		> libxcrypt-$(VERSION).tar.xz.sha256sum.T
+	$(AM_V_at)$(SCRIPTS_AUX)/move-if-change \
+		libxcrypt-$(VERSION).tar.xz.sha256sum.T \
+		libxcrypt-$(VERSION).tar.xz.sha256sum
+
+libxcrypt-gpgkey.gpg:
+	$(GPG2) \
+		--export \
+		--export-options \
+			export-minimal \
+			F52E98007594C21D \
+		> libxcrypt-gpgkey.gpg.T
+	$(AM_V_at)$(SCRIPTS_AUX)/move-if-change \
+		libxcrypt-gpgkey.gpg.T \
+		libxcrypt-gpgkey.gpg
+
+CLEANFILES += \
+	libxcrypt-$(VERSION).tar.xz.asc* \
+	libxcrypt-$(VERSION).tar.xz.sha256sum* \
+	libxcrypt-gpgkey.gpg*
 
 # Every object file depends on crypt-symbol-vers.h and crypt-hashes.h,
 # which are generated files, so automatic dependency generation is not

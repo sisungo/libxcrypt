@@ -107,6 +107,9 @@ hmac_sha1_process_data (const uint8_t *text, size_t text_len,
       k_opad[i] ^= key[i];
     }
 
+  /* Clean the stack. */
+  explicit_bzero (tk, HASH_LENGTH);
+
   /*
    * Perform inner HASH.
    * Start with inner pad,
@@ -117,6 +120,9 @@ hmac_sha1_process_data (const uint8_t *text, size_t text_len,
   sha1_process_bytes (text, &ctx, text_len);
   sha1_finish_ctx(&ctx, resbuf);
 
+  /* Clean the stack. */
+  explicit_bzero (k_ipad, HMAC_BLOCKSZ);
+
   /*
    * Perform outer HASH.
    * Start with the outer pad,
@@ -126,6 +132,9 @@ hmac_sha1_process_data (const uint8_t *text, size_t text_len,
   sha1_process_bytes (k_opad, &ctx, HMAC_BLOCKSZ);
   sha1_process_bytes (resbuf, &ctx, HASH_LENGTH);
   sha1_finish_ctx(&ctx, resbuf);
+
+  /* Clean the stack. */
+  explicit_bzero (k_opad, HMAC_BLOCKSZ);
 }
 
 #endif
