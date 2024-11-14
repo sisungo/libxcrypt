@@ -1,6 +1,6 @@
 Tests: testsuite
-Depends: @
-Restrictions: build-needed, allow-stderr
+Depends: build-essential, @builddeps@
+Restrictions: allow-stderr
 
 Tests: libcrypt-dev
 Depends: build-essential, libcrypt-dev, pkg-config

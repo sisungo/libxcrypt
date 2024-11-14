@@ -73,6 +73,9 @@ build-deb2/.stamp: build-deb2/config.status
 	touch $@
 
 build-udeb/.stamp: build-udeb/config.status
+	# ignore the blhc false positives (see CONFFLAGS_udeb)
+	@echo 'blhc: ignore-line-regexp: libtool: compile: +[^ ]*gcc .+ -Os -fomit-frame-pointer .+'
+	@echo 'blhc: ignore-line-regexp: [^ ]*gcc .+ -Os -fomit-frame-pointer .+'
 	dh_auto_build --builddir=build-udeb
 	touch $@
 
@@ -92,15 +95,6 @@ ifdef BUILD_DEB1
 	cd build-deb1/ && \
 	$(MAKE) install DESTDIR=$D
 
-	# Move the shared library back to /lib/ because this is where the
-	# libc6 package used to install it (see #953562 for details).
-	mkdir -p $D/lib/$(DEB_HOST_MULTIARCH)
-	mv $D/usr/lib/$(DEB_HOST_MULTIARCH)/libcrypt.so.1* $D/lib/$(DEB_HOST_MULTIARCH)/
-ifeq ($(DEB_HOST_ARCH), alpha)
-	ln -sf /lib/$(DEB_HOST_MULTIARCH)/libcrypt.so.1.1 $D/usr/lib/$(DEB_HOST_MULTIARCH)/libcrypt.so
-else
-	ln -sf /lib/$(DEB_HOST_MULTIARCH)/libcrypt.so.1 $D/usr/lib/$(DEB_HOST_MULTIARCH)/libcrypt.so
-endif
 ifeq ($(BUILD_DEV_VER), 1)
 	dh_movefiles -plibcrypt-dev --sourcedir=debian/libcrypt1/
 else

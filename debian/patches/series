@@ -1,4 +1,7 @@
 # backported changes
+support_hurd_amd64
+
+fix_manpages
 
 # Debian integration
 include_ltdlm4

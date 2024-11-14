@@ -1,3 +1,25 @@
+libxcrypt (1:4.4.36-5) unstable; urgency=medium
+
+  * Fix the the testsuite autopkgtest, which relied on some invalid
+    assumptions about the build environment which recently changed.
+  * Add support for hurd-amd64. (Closes: #1076326)
+  * Fix crypt_gensalt(3). (Closes: #1072803)
+
+ -- Marco d'Itri <md@linux.it>  Fri, 16 Aug 2024 01:21:39 +0200
+
+libxcrypt (1:4.4.36-4) unstable; urgency=medium
+
+  * Reupload to unstable.
+
+ -- Marco d'Itri <md@linux.it>  Mon, 01 Jan 2024 14:00:09 +0100
+
+libxcrypt (1:4.4.36-3) experimental; urgency=medium
+
+  [ Helmut Grohne ]
+  * Move libcrypt.so.* to /usr. (Closes: #1055941)
+
+ -- Marco d'Itri <md@linux.it>  Thu, 16 Nov 2023 22:31:28 +0100
+
 libxcrypt (1:4.4.36-2) unstable; urgency=medium
 
   * Stop marking libcrypt1 Important+Protected. This was needed to help

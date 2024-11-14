@@ -1,0 +1,31 @@
+https://github.com/besser82/libxcrypt/pull/189
+
+commit 93d72c5a20723eb05dc3d78628b6d09a80cc72fa
+Author: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date:   Sun Jul 14 13:13:07 2024 +0200
+
+    Add binary compatibility for x86_64 GNU/Hurd
+
+diff --git a/lib/libcrypt.map.in b/lib/libcrypt.map.in
+index 88ea911..a56b7bf 100644
+--- a/lib/libcrypt.map.in
++++ b/lib/libcrypt.map.in
+@@ -43,5 +43,5 @@ fcrypt			-		GLIBC_2.0
+ %chain GLIBC_2.0 GLIBC_2.2 GLIBC_2.2.1 GLIBC_2.2.2 GLIBC_2.2.5 GLIBC_2.2.6
+ %chain GLIBC_2.3 GLIBC_2.4 GLIBC_2.12 GLIBC_2.16 GLIBC_2.17 GLIBC_2.18
+ %chain GLIBC_2.21 GLIBC_2.27 GLIBC_2.29 GLIBC_2.32 GLIBC_2.33 GLIBC_2.35
+-%chain GLIBC_2.36
++%chain GLIBC_2.36 GLIBC_2.38
+ %chain OW_CRYPT_1.0 XCRYPT_2.0 XCRYPT_4.3 XCRYPT_4.4
+diff --git a/lib/libcrypt.minver b/lib/libcrypt.minver
+index 8478077..c5a5bf2 100644
+--- a/lib/libcrypt.minver
++++ b/lib/libcrypt.minver
+@@ -51,6 +51,7 @@
+ #VERSION     SYSTEM          CPU_FAMILY    PREPROCESSOR_CHECK
+ 
+ # GNU Hurd
++GLIBC_2.38   gnu             x86_64
+ GLIBC_2.2.6  gnu             i[3-9]86
+ ERROR        gnu             .
+ 
