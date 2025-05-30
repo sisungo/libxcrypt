@@ -1,3 +1,9 @@
+libxcrypt (1:4.4.36-5deepin1) unstable; urgency=medium
+
+  * feat: add sw64 support.
+
+ -- hudeng <hudeng@deepin.org>  Fri, 30 May 2025 09:22:06 +0800
+
 libxcrypt (1:4.4.36-5) unstable; urgency=medium
 
   * Fix the the testsuite autopkgtest, which relied on some invalid

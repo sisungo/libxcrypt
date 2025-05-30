@@ -1,0 +1,24 @@
+From 3e80f8451dd212b4a686142e8a05c43f72ad87d7 Mon Sep 17 00:00:00 2001
+From: hudeng <hudeng@deepin.org>
+Date: Fri, 30 May 2025 09:20:50 +0800
+Subject: [PATCH] feat: add sw64 support
+
+---
+ lib/libcrypt.minver | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/libcrypt.minver b/lib/libcrypt.minver
+index c5a5bf2..9e7479d 100644
+--- a/lib/libcrypt.minver
++++ b/lib/libcrypt.minver
+@@ -80,6 +80,7 @@ GLIBC_2.3    linux.*gnu      powerpc64
+ GLIBC_2.2.5  linux.*gnu      x86_64        defined __x86_64__ && ULONG_MAX != UINT_MAX /* 64 */
+ GLIBC_2.2    linux.*gnu      s390x
+ GLIBC_2.0    linux.*gnu      alpha
++GLIBC_2.0    linux.*gnu      sw_64
+ GLIBC_2.0    linux.*gnu      e2k
+ GLIBC_2.0    linux.*gnu      hppa
+ GLIBC_2.0    linux.*gnu      i[3-9]86
+-- 
+2.45.2
+
