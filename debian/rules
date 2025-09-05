@@ -90,6 +90,13 @@ ifdef BUILD_DEB2
 endif
 endif
 
+override_dh_strip:
+ifeq (${DEB_TARGET_MULTIARCH},riscv64-linux-gnu)
+	dh_strip -Xlibcrypt.so.1 --
+else
+	dh_strip --
+endif
+
 override_dh_auto_install:
 ifdef BUILD_DEB1
 	cd build-deb1/ && \
